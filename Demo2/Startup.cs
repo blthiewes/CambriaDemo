@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Demo.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MySQL.Data.Entity.Extensions;
 
-namespace Demo2
+namespace Demo.WebApi
 {
     public class Startup
     {
@@ -19,6 +17,7 @@ namespace Demo2
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
         }
 
@@ -29,6 +28,14 @@ namespace Demo2
         {
             // Add framework services.
             services.AddMvc();
+
+            var sqlConnectionString = Configuration.GetConnectionString("DataAccessMySqlProvider");
+
+            services.AddDbContext<DemoContext>(options =>
+                options.UseMySQL(
+                    sqlConnectionString
+                )
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
